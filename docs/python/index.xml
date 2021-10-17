@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Posts on Jie Blog</title>
-    <link>http://example.org/posts/</link>
-    <description>Recent content in Posts on Jie Blog</description>
+    <title>Pythons on Jie Blog</title>
+    <link>http://example.org/python/</link>
+    <description>Recent content in Pythons on Jie Blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Sun, 17 Oct 2021 22:33:39 +0800</lastBuildDate><atom:link href="http://example.org/posts/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Sun, 17 Oct 2021 22:33:39 +0800</lastBuildDate><atom:link href="http://example.org/python/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Python 代码插桩及语法树分析</title>
-      <link>http://example.org/posts/ast/</link>
+      <link>http://example.org/python/ast/</link>
       <pubDate>Sun, 17 Oct 2021 22:33:39 +0800</pubDate>
       
-      <guid>http://example.org/posts/ast/</guid>
+      <guid>http://example.org/python/ast/</guid>
       <description>python支持对编写的程序进行源代码的改动，例如通过AST模块将代码进行解析成语法树，然后在遍历语法节点的过程中对代码进行改动
 本文主要讨论Python的ast语法解析及代码插桩过程。
  Python的ast功能 字符串代码解释 Python支持执行以字符串形式提供的源代码，例如：

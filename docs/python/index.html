@@ -26,19 +26,19 @@
 
     
     
-      <link href="/index.xml" rel="alternate" type="application/rss+xml" title="Jie Blog" />
-      <link href="/index.xml" rel="feed" type="application/rss+xml" title="Jie Blog" />
+      <link href="/python/index.xml" rel="alternate" type="application/rss+xml" title="Jie Blog" />
+      <link href="/python/index.xml" rel="feed" type="application/rss+xml" title="Jie Blog" />
       
     
     
-    <meta property="og:title" content="Jie Blog" />
+    <meta property="og:title" content="Pythons" />
 <meta property="og:description" content="" />
 <meta property="og:type" content="website" />
-<meta property="og:url" content="http://example.org/" />
+<meta property="og:url" content="http://example.org/python/" />
 
-<meta itemprop="name" content="Jie Blog">
+<meta itemprop="name" content="Pythons">
 <meta itemprop="description" content=""><meta name="twitter:card" content="summary"/>
-<meta name="twitter:title" content="Jie Blog"/>
+<meta name="twitter:title" content="Pythons"/>
 <meta name="twitter:description" content=""/>
 
 	
@@ -83,7 +83,7 @@
 
       <div class="tc-l pv3 ph3 ph4-ns">
         <h1 class="f2 f-subheadline-l fw2 light-silver mb0 lh-title">
-          Jie Blog
+          Pythons
         </h1>
         
       </div>
@@ -93,68 +93,31 @@
 
     <main class="pb7" role="main">
       
-
-  <article class="cf ph3 ph5-l pv3 pv4-l f4 tc-l center measure-wide lh-copy mid-gray">
-    
-  </article>
-  
-  
-  
-  
-  
-  
-  
-    
-    
-
-    <div class="pa3 pa4-ns w-100 w-70-ns center">
+  <article class="pa3 pa4-ns nested-copy-line-height nested-img">
+    <section class="cf ph3 ph5-l pv3 pv4-l f4 tc-l center measure-wide lh-copy mid-gray"></section>
+    <section class="flex-ns flex-wrap justify-around mt5">
       
-       
-          <h1 class="flex-none">
-            Recent Posts
-          </h1>
-        
-
-      
-
-      <section class="w-100 mw8">
-        
-        
-          <div class="relative w-100 mb4">
-            
-<article class="bb b--black-10">
-  <div class="db pv4 ph3 ph0-l no-underline dark-gray">
-    <div class="flex flex-column flex-row-ns">
-      
-      <div class="blah w-100">
-        <h1 class="f3 fw1 athelas mt0 lh-title">
-          <a href="/posts/ast/" class="color-inherit dim link">
-            Python 代码插桩及语法树分析
-            </a>
-        </h1>
-        <div class="f6 f5-l lh-copy nested-copy-line-height nested-links">
-          python支持对编写的程序进行源代码的改动，例如通过AST模块将代码进行解析成语法树，然后在遍历语法节点的过程中对代码进行改动
+        <div class="relative w-100 w-30-l mb4 bg-white"><div class="relative w-100 mb4 bg-white nested-copy-line-height">
+  <div class="bg-white mb3 pa4 gray overflow-hidden">
+    <span class="f6 db">Python</span>
+    <h1 class="f3 near-black">
+      <a href="/python/ast/" class="link black dim">
+        Python 代码插桩及语法树分析
+      </a>
+    </h1>
+    <div class="nested-links f5 lh-copy nested-copy-line-height">
+      python支持对编写的程序进行源代码的改动，例如通过AST模块将代码进行解析成语法树，然后在遍历语法节点的过程中对代码进行改动
 本文主要讨论Python的ast语法解析及代码插桩过程。
  Python的ast功能 字符串代码解释 Python支持执行以字符串形式提供的源代码，例如：
 	&gt;&gt;&gt; x = 42 &gt;&gt;&gt; eval('2 + 3*4 + x') 56 &gt;&gt;&gt; exec('for i in range(5): print(i)') 0 1 2 3 4 Python 语法树转换 可以使用ast模块将python源代码编译为一个抽象语法树，这样就可以分析源代码，例如：
 &gt;&gt;&gt; import ast &gt;&gt;&gt; ex = ast.parse('2 + 3*4 +x', mode='eval') &gt;&gt;&gt; ex &lt;ast.Expression object at 0x7f19a73c1d90&gt; &gt;&gt;&gt; ast.dump(ex) &quot;Expression(body=BinOp(left=BinOp(left=Constant(value=2), op=Add(), right=BinOp(left=Constant(value=3), op=Mult(), right=Constant(value=4))), op=Add(), right=Name(id='x', ctx=Load())))&quot; ast的parse方法会将源代码解析为语法树的节点，mode参数可以选择为:
  exec, 代表编译一个模块 single, 一个单独的语句 eval，一个表达式 通过dump方法可以看到展开的语法树，树的结构如下图：   ast模块支持对各个树的节点进行操作，通过定义一个访问者类，在类中实现了各种的visit_NodeName()方法，把感兴趣的节点保留下来
-        </div>
-          <a href="/posts/ast/" class="ba b--moon-gray bg-light-gray br2 color-inherit dib f7 hover-bg-moon-gray link mt2 ph2 pv1">read more</a>
-        
-      </div>
     </div>
   </div>
-</article>
-
-          </div>
-        
-      </section>
-
+</div>
+</div>
       
-
-      </div>
-  
+    </section></article>
 
     </main>
     <footer class="bg-black bottom-0 w-100 pa3" role="contentinfo">
