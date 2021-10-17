@@ -1,0 +1,6 @@
+[submodule "jie-site/themes/hermit"]
+	path = jie-site/themes/hermit
+	url = https://github.com/Track3/hermit.git
+[submodule "jie-site/themes/ananke"]
+	path = jie-site/themes/ananke
+	url = https://github.com/budparr/gohugo-theme-ananke.git
