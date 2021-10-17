@@ -1,186 +1,207 @@
 <!DOCTYPE html>
-<html lang="en-us">
+<html lang="en">
+
   <head>
     <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Language" content="en">
+    <meta name="color-scheme" content="light dark">
+
     
-    <title>Python 代码插桩及语法树分析 | Jie Blog</title>
-    <meta name="viewport" content="width=device-width,minimum-scale=1">
+
+    <meta name="author" content="Jie Cai">
     <meta name="description" content="python支持对编写的程序进行源代码的改动，例如通过AST模块将代码进行解析成语法树，然后在遍历语法节点的过程中对代码进行改动
 本文主要讨论Python的ast语法解析及代码插桩过程。
- Python的ast功能 字符串代码解释 Python支持执行以字符串形式提供的源代码，例如：
-	&gt;&gt;&gt; x = 42 &gt;&gt;&gt; eval(&#39;2 &#43; 3*4 &#43; x&#39;) 56 &gt;&gt;&gt; exec(&#39;for i in range(5): print(i)&#39;) 0 1 2 3 4 Python 语法树转换 可以使用ast模块将python源代码编译为一个抽象语法树，这样就可以分析源代码，例如：
-&gt;&gt;&gt; import ast &gt;&gt;&gt; ex = ast.parse(&#39;2 &#43; 3*4 &#43;x&#39;, mode=&#39;eval&#39;) &gt;&gt;&gt; ex &lt;ast.Expression object at 0x7f19a73c1d90&gt; &gt;&gt;&gt; ast.dump(ex) &quot;Expression(body=BinOp(left=BinOp(left=Constant(value=2), op=Add(), right=BinOp(left=Constant(value=3), op=Mult(), right=Constant(value=4))), op=Add(), right=Name(id=&#39;x&#39;, ctx=Load())))&quot; ast的parse方法会将源代码解析为语法树的节点，mode参数可以选择为:
+ Python的ast功能    字符串代码解释    Python支持执行以字符串形式提供的源代码，例如：
+&gt;&gt;&gt; x = 42 &gt;&gt;&gt; eval(&#39;2 &#43; 3*4 &#43; x&#39;) 56 &gt;&gt;&gt; exec(&#39;for i in range(5): print(i)&#39;) 0 1 2 3 4 Python 语法树转换    可以使用ast模块将python源代码编译为一个抽象语法树，这样就可以分析源代码，例如：
+&gt;&gt;&gt; import ast &gt;&gt;&gt; ex = ast.parse(&#39;2 &#43; 3*4 &#43;x&#39;, mode=&#39;eval&#39;) &gt;&gt;&gt; ex &lt;ast.Expression object at 0x7f19a73c1d90&gt; &gt;&gt;&gt; ast.dump(ex) &#34;Expression(body=BinOp(left=BinOp(left=Constant(value=2), op=Add(), right=BinOp(left=Constant(value=3), op=Mult(), right=Constant(value=4))), op=Add(), right=Name(id=&#39;x&#39;, ctx=Load())))&#34; ast的parse方法会将源代码解析为语法树的节点，mode参数可以选择为:
  exec, 代表编译一个模块 single, 一个单独的语句 eval，一个表达式 通过dump方法可以看到展开的语法树，树的结构如下图：   ast模块支持对各个树的节点进行操作，通过定义一个访问者类，在类中实现了各种的visit_NodeName()方法，把感兴趣的节点保留下来">
-    <meta name="generator" content="Hugo 0.88.1" />
-    
-    
-      <META NAME="ROBOTS" CONTENT="NOINDEX, NOFOLLOW">
-    
+    <meta name="keywords" content="blog,developer,personal">
 
-    
-<link rel="stylesheet" href="/ananke/css/main.min.css" >
+    <meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="Python 代码插桩及语法树分析"/>
+<meta name="twitter:description" content="python支持对编写的程序进行源代码的改动，例如通过AST模块将代码进行解析成语法树，然后在遍历语法节点的过程中对代码进行改动
+本文主要讨论Python的ast语法解析及代码插桩过程。
+ Python的ast功能    字符串代码解释    Python支持执行以字符串形式提供的源代码，例如：
+&gt;&gt;&gt; x = 42 &gt;&gt;&gt; eval(&#39;2 &#43; 3*4 &#43; x&#39;) 56 &gt;&gt;&gt; exec(&#39;for i in range(5): print(i)&#39;) 0 1 2 3 4 Python 语法树转换    可以使用ast模块将python源代码编译为一个抽象语法树，这样就可以分析源代码，例如：
+&gt;&gt;&gt; import ast &gt;&gt;&gt; ex = ast.parse(&#39;2 &#43; 3*4 &#43;x&#39;, mode=&#39;eval&#39;) &gt;&gt;&gt; ex &lt;ast.Expression object at 0x7f19a73c1d90&gt; &gt;&gt;&gt; ast.dump(ex) &#34;Expression(body=BinOp(left=BinOp(left=Constant(value=2), op=Add(), right=BinOp(left=Constant(value=3), op=Mult(), right=Constant(value=4))), op=Add(), right=Name(id=&#39;x&#39;, ctx=Load())))&#34; ast的parse方法会将源代码解析为语法树的节点，mode参数可以选择为:
+ exec, 代表编译一个模块 single, 一个单独的语句 eval，一个表达式 通过dump方法可以看到展开的语法树，树的结构如下图：   ast模块支持对各个树的节点进行操作，通过定义一个访问者类，在类中实现了各种的visit_NodeName()方法，把感兴趣的节点保留下来"/>
 
-
-
-
-    
-      
-
-    
-
-    
-    
     <meta property="og:title" content="Python 代码插桩及语法树分析" />
 <meta property="og:description" content="python支持对编写的程序进行源代码的改动，例如通过AST模块将代码进行解析成语法树，然后在遍历语法节点的过程中对代码进行改动
 本文主要讨论Python的ast语法解析及代码插桩过程。
- Python的ast功能 字符串代码解释 Python支持执行以字符串形式提供的源代码，例如：
-	&gt;&gt;&gt; x = 42 &gt;&gt;&gt; eval(&#39;2 &#43; 3*4 &#43; x&#39;) 56 &gt;&gt;&gt; exec(&#39;for i in range(5): print(i)&#39;) 0 1 2 3 4 Python 语法树转换 可以使用ast模块将python源代码编译为一个抽象语法树，这样就可以分析源代码，例如：
-&gt;&gt;&gt; import ast &gt;&gt;&gt; ex = ast.parse(&#39;2 &#43; 3*4 &#43;x&#39;, mode=&#39;eval&#39;) &gt;&gt;&gt; ex &lt;ast.Expression object at 0x7f19a73c1d90&gt; &gt;&gt;&gt; ast.dump(ex) &quot;Expression(body=BinOp(left=BinOp(left=Constant(value=2), op=Add(), right=BinOp(left=Constant(value=3), op=Mult(), right=Constant(value=4))), op=Add(), right=Name(id=&#39;x&#39;, ctx=Load())))&quot; ast的parse方法会将源代码解析为语法树的节点，mode参数可以选择为:
+ Python的ast功能    字符串代码解释    Python支持执行以字符串形式提供的源代码，例如：
+&gt;&gt;&gt; x = 42 &gt;&gt;&gt; eval(&#39;2 &#43; 3*4 &#43; x&#39;) 56 &gt;&gt;&gt; exec(&#39;for i in range(5): print(i)&#39;) 0 1 2 3 4 Python 语法树转换    可以使用ast模块将python源代码编译为一个抽象语法树，这样就可以分析源代码，例如：
+&gt;&gt;&gt; import ast &gt;&gt;&gt; ex = ast.parse(&#39;2 &#43; 3*4 &#43;x&#39;, mode=&#39;eval&#39;) &gt;&gt;&gt; ex &lt;ast.Expression object at 0x7f19a73c1d90&gt; &gt;&gt;&gt; ast.dump(ex) &#34;Expression(body=BinOp(left=BinOp(left=Constant(value=2), op=Add(), right=BinOp(left=Constant(value=3), op=Mult(), right=Constant(value=4))), op=Add(), right=Name(id=&#39;x&#39;, ctx=Load())))&#34; ast的parse方法会将源代码解析为语法树的节点，mode参数可以选择为:
  exec, 代表编译一个模块 single, 一个单独的语句 eval，一个表达式 通过dump方法可以看到展开的语法树，树的结构如下图：   ast模块支持对各个树的节点进行操作，通过定义一个访问者类，在类中实现了各种的visit_NodeName()方法，把感兴趣的节点保留下来" />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="http://example.org/posts/ast/" /><meta property="article:section" content="posts" />
 <meta property="article:published_time" content="2021-10-17T22:33:39+08:00" />
 <meta property="article:modified_time" content="2021-10-17T22:33:39+08:00" />
 
-<meta itemprop="name" content="Python 代码插桩及语法树分析">
-<meta itemprop="description" content="python支持对编写的程序进行源代码的改动，例如通过AST模块将代码进行解析成语法树，然后在遍历语法节点的过程中对代码进行改动
-本文主要讨论Python的ast语法解析及代码插桩过程。
- Python的ast功能 字符串代码解释 Python支持执行以字符串形式提供的源代码，例如：
-	&gt;&gt;&gt; x = 42 &gt;&gt;&gt; eval(&#39;2 &#43; 3*4 &#43; x&#39;) 56 &gt;&gt;&gt; exec(&#39;for i in range(5): print(i)&#39;) 0 1 2 3 4 Python 语法树转换 可以使用ast模块将python源代码编译为一个抽象语法树，这样就可以分析源代码，例如：
-&gt;&gt;&gt; import ast &gt;&gt;&gt; ex = ast.parse(&#39;2 &#43; 3*4 &#43;x&#39;, mode=&#39;eval&#39;) &gt;&gt;&gt; ex &lt;ast.Expression object at 0x7f19a73c1d90&gt; &gt;&gt;&gt; ast.dump(ex) &quot;Expression(body=BinOp(left=BinOp(left=Constant(value=2), op=Add(), right=BinOp(left=Constant(value=3), op=Mult(), right=Constant(value=4))), op=Add(), right=Name(id=&#39;x&#39;, ctx=Load())))&quot; ast的parse方法会将源代码解析为语法树的节点，mode参数可以选择为:
- exec, 代表编译一个模块 single, 一个单独的语句 eval，一个表达式 通过dump方法可以看到展开的语法树，树的结构如下图：   ast模块支持对各个树的节点进行操作，通过定义一个访问者类，在类中实现了各种的visit_NodeName()方法，把感兴趣的节点保留下来"><meta itemprop="datePublished" content="2021-10-17T22:33:39+08:00" />
-<meta itemprop="dateModified" content="2021-10-17T22:33:39+08:00" />
-<meta itemprop="wordCount" content="413">
-<meta itemprop="keywords" content="" /><meta name="twitter:card" content="summary"/>
-<meta name="twitter:title" content="Python 代码插桩及语法树分析"/>
-<meta name="twitter:description" content="python支持对编写的程序进行源代码的改动，例如通过AST模块将代码进行解析成语法树，然后在遍历语法节点的过程中对代码进行改动
-本文主要讨论Python的ast语法解析及代码插桩过程。
- Python的ast功能 字符串代码解释 Python支持执行以字符串形式提供的源代码，例如：
-	&gt;&gt;&gt; x = 42 &gt;&gt;&gt; eval(&#39;2 &#43; 3*4 &#43; x&#39;) 56 &gt;&gt;&gt; exec(&#39;for i in range(5): print(i)&#39;) 0 1 2 3 4 Python 语法树转换 可以使用ast模块将python源代码编译为一个抽象语法树，这样就可以分析源代码，例如：
-&gt;&gt;&gt; import ast &gt;&gt;&gt; ex = ast.parse(&#39;2 &#43; 3*4 &#43;x&#39;, mode=&#39;eval&#39;) &gt;&gt;&gt; ex &lt;ast.Expression object at 0x7f19a73c1d90&gt; &gt;&gt;&gt; ast.dump(ex) &quot;Expression(body=BinOp(left=BinOp(left=Constant(value=2), op=Add(), right=BinOp(left=Constant(value=3), op=Mult(), right=Constant(value=4))), op=Add(), right=Name(id=&#39;x&#39;, ctx=Load())))&quot; ast的parse方法会将源代码解析为语法树的节点，mode参数可以选择为:
- exec, 代表编译一个模块 single, 一个单独的语句 eval，一个表达式 通过dump方法可以看到展开的语法树，树的结构如下图：   ast模块支持对各个树的节点进行操作，通过定义一个访问者类，在类中实现了各种的visit_NodeName()方法，把感兴趣的节点保留下来"/>
 
-	
+
+    <title>
+  Python 代码插桩及语法树分析 · Jie Blog
+</title>
+
+    
+      <link rel="canonical" href="http://example.org/posts/ast/">
+    
+
+    <link rel="preload" href="/fonts/forkawesome-webfont.woff2?v=1.2.0" as="font" type="font/woff2" crossorigin>
+
+    
+      
+      
+      <link rel="stylesheet" href="/css/coder.min.708686f8ab8176e91d44fcbe488a0fe0333b94f405cf18a52383d67ba22f0ccb.css" integrity="sha256-cIaG&#43;KuBdukdRPy&#43;SIoP4DM7lPQFzxilI4PWe6IvDMs=" crossorigin="anonymous" media="screen" />
+    
+
+    
+
+    
+      
+        
+        
+        <link rel="stylesheet" href="/css/coder-dark.min.aa883b9ce35a8ff4a2a5008619005175e842bb18a8a9f9cc2bbcf44dab2d91fa.css" integrity="sha256-qog7nONaj/SipQCGGQBRdehCuxioqfnMK7z0Tastkfo=" crossorigin="anonymous" media="screen" />
+      
+    
+
+    
+
+    
+
+    <link rel="icon" type="image/png" href="/img/favicon-32x32.png" sizes="32x32">
+    <link rel="icon" type="image/png" href="/img/favicon-16x16.png" sizes="16x16">
+
+    <link rel="apple-touch-icon" href="/images/apple-touch-icon.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+
+    
+      <script defer src="https://twemoji.maxcdn.com/v/13.0.2/twemoji.min.js"
+        integrity="sha384-wyB/MspSJ/r2bT2kCj44qtsYRYlpzO2oAPhRj5myrWD63dt6qWv4x8AZe7Fl3K3b" crossorigin="anonymous"></script>
+    
+
+    <meta name="generator" content="Hugo 0.88.1" />
   </head>
 
-  <body class="ma0 avenir bg-near-white">
-
-    
-   
   
-
-  <header>
-    <div class="bg-black">
-      <nav class="pv3 ph3 ph4-ns" role="navigation">
-  <div class="flex-l justify-between items-center center">
-    <a href="/" class="f3 fw2 hover-white no-underline white-90 dib">
-      
-        Jie Blog
-      
+  
+    
+  
+  <body class="preload-transitions colorscheme-auto"
+        onload=" twemoji.parse(document.body); "
+  >
+    
+<div class="float-container">
+    <a id="dark-mode-toggle" class="colorscheme-toggle">
+        <i class="fa fa-adjust fa-fw" aria-hidden="true"></i>
     </a>
-    <div class="flex-l items-center">
-      
-
-      
-      
+</div>
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-    </div>
-  </div>
+    <main class="wrapper">
+      <nav class="navigation">
+  <section class="container">
+    <a class="navigation-title" href="/">
+      Jie Blog
+    </a>
+    
+      <input type="checkbox" id="menu-toggle" />
+      <label class="menu-button float-right" for="menu-toggle">
+        <i class="fa fa-bars fa-fw" aria-hidden="true"></i>
+      </label>
+      <ul class="navigation-list">
+        
+          
+            <li class="navigation-item">
+              <a class="navigation-link" href="/posts/">Blog</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link" href="/about/">About</a>
+            </li>
+          
+        
+        
+      </ul>
+    
+  </section>
 </nav>
 
-    </div>
-  </header>
 
-
-
-    <main class="pb7" role="main">
-      
-  
-  <article class="flex-l flex-wrap justify-between mw8 center ph3">
-    <header class="mt4 w-100">
-      <aside class="instapaper_ignoref b helvetica tracked">
+      <div class="content">
+        
+  <section class="container post">
+    <article>
+      <header>
+        <div class="post-title">
+          <h1 class="title">
+            <a class="title-link" href="http://example.org/posts/ast/">
+              Python 代码插桩及语法树分析
+            </a>
+          </h1>
+        </div>
+        <div class="post-meta">
+          <div class="date">
+            <span class="posted-on">
+              <i class="fa fa-calendar" aria-hidden="true"></i>
+              <time datetime='2021-10-17T22:33:39&#43;08:00'>
+                October 17, 2021
+              </time>
+            </span>
+            <span class="reading-time">
+              <i class="fa fa-clock-o" aria-hidden="true"></i>
+              2-minute read
+            </span>
+          </div>
           
-        POSTS
-      </aside>
-      
+          
+          
+        </div>
+      </header>
 
-
-
-
-  <div id="sharing" class="mt3">
-
-    
-    <a href="https://www.facebook.com/sharer.php?u=http://example.org/posts/ast/" class="facebook no-underline" aria-label="share on Facebook">
-      <svg height="32px"  style="enable-background:new 0 0 67 67;" version="1.1" viewBox="0 0 67 67" width="32px" xml:space="preserve" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><path d="M28.765,50.32h6.744V33.998h4.499l0.596-5.624h-5.095  l0.007-2.816c0-1.466,0.14-2.253,2.244-2.253h2.812V17.68h-4.5c-5.405,0-7.307,2.729-7.307,7.317v3.377h-3.369v5.625h3.369V50.32z   M33,64C16.432,64,3,50.569,3,34S16.432,4,33,4s30,13.431,30,30S49.568,64,33,64z" style="fill-rule:evenodd;clip-rule:evenodd;"/></svg>
-
-    </a>
-
-    
-    
-    <a href="https://twitter.com/share?url=http://example.org/posts/ast/&amp;text=Python%20%e4%bb%a3%e7%a0%81%e6%8f%92%e6%a1%a9%e5%8f%8a%e8%af%ad%e6%b3%95%e6%a0%91%e5%88%86%e6%9e%90" class="twitter no-underline" aria-label="share on Twitter">
-      <svg height="32px"  style="enable-background:new 0 0 67 67;" version="1.1" viewBox="0 0 67 67" width="32px" xml:space="preserve" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><path d="M37.167,22.283c-2.619,0.953-4.274,3.411-4.086,6.101  l0.063,1.038l-1.048-0.127c-3.813-0.487-7.145-2.139-9.974-4.915l-1.383-1.377l-0.356,1.017c-0.754,2.267-0.272,4.661,1.299,6.271  c0.838,0.89,0.649,1.017-0.796,0.487c-0.503-0.169-0.943-0.296-0.985-0.233c-0.146,0.149,0.356,2.076,0.754,2.839  c0.545,1.06,1.655,2.097,2.871,2.712l1.027,0.487l-1.215,0.021c-1.173,0-1.215,0.021-1.089,0.467  c0.419,1.377,2.074,2.839,3.918,3.475l1.299,0.444l-1.131,0.678c-1.676,0.976-3.646,1.526-5.616,1.568  C19.775,43.256,19,43.341,19,43.405c0,0.211,2.557,1.397,4.044,1.864c4.463,1.377,9.765,0.783,13.746-1.568  c2.829-1.673,5.657-5,6.978-8.221c0.713-1.716,1.425-4.851,1.425-6.354c0-0.975,0.063-1.102,1.236-2.267  c0.692-0.678,1.341-1.419,1.467-1.631c0.21-0.403,0.188-0.403-0.88-0.043c-1.781,0.636-2.033,0.551-1.152-0.402  c0.649-0.678,1.425-1.907,1.425-2.267c0-0.063-0.314,0.042-0.671,0.233c-0.377,0.212-1.215,0.53-1.844,0.72l-1.131,0.361l-1.027-0.7  c-0.566-0.381-1.361-0.805-1.781-0.932C39.766,21.902,38.131,21.944,37.167,22.283z M33,64C16.432,64,3,50.569,3,34S16.432,4,33,4  s30,13.431,30,30S49.568,64,33,64z" style="fill-rule:evenodd;clip-rule:evenodd;fill:;"/></svg>
-
-    </a>
-
-    
-    <a href="https://www.linkedin.com/shareArticle?mini=true&amp;url=http://example.org/posts/ast/&amp;title=Python%20%e4%bb%a3%e7%a0%81%e6%8f%92%e6%a1%a9%e5%8f%8a%e8%af%ad%e6%b3%95%e6%a0%91%e5%88%86%e6%9e%90" class="linkedin no-underline" aria-label="share on LinkedIn">
-      <svg  height="32px"  style="enable-background:new 0 0 65 65;" version="1.1" viewBox="0 0 65 65" width="32px" xml:space="preserve" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-  <path d="M50.837,48.137V36.425c0-6.275-3.35-9.195-7.816-9.195  c-3.604,0-5.219,1.983-6.119,3.374V27.71h-6.79c0.09,1.917,0,20.427,0,20.427h6.79V36.729c0-0.609,0.044-1.219,0.224-1.655  c0.49-1.22,1.607-2.483,3.482-2.483c2.458,0,3.44,1.873,3.44,4.618v10.929H50.837z M22.959,24.922c2.367,0,3.842-1.57,3.842-3.531  c-0.044-2.003-1.475-3.528-3.797-3.528s-3.841,1.524-3.841,3.528c0,1.961,1.474,3.531,3.753,3.531H22.959z M34,64  C17.432,64,4,50.568,4,34C4,17.431,17.432,4,34,4s30,13.431,30,30C64,50.568,50.568,64,34,64z M26.354,48.137V27.71h-6.789v20.427  H26.354z" style="fill-rule:evenodd;clip-rule:evenodd;fill:;"/>
-</svg>
-
-    </a>
-  </div>
-
-
-      <h1 class="f1 athelas mt3 mb1">Python 代码插桩及语法树分析</h1>
-      
-      
-      
-      <time class="f6 mv4 dib tracked" datetime="2021-10-17T22:33:39+08:00">October 17, 2021</time>
-      
-
-      
-      
-    </header>
-    <div class="nested-copy-line-height lh-copy serif f4 nested-links nested-img mid-gray pr4-l w-two-thirds-l"><p>python支持对编写的程序进行源代码的改动，例如通过AST模块将代码进行解析成语法树，然后在遍历语法节点的过程中对代码进行改动</p>
+      <div>
+        
+        <p>python支持对编写的程序进行源代码的改动，例如通过AST模块将代码进行解析成语法树，然后在遍历语法节点的过程中对代码进行改动</p>
 <p>本文主要讨论Python的ast语法解析及代码插桩过程。</p>
 <hr>
-<h3 id="python的ast功能">Python的ast功能</h3>
-<h4 id="字符串代码解释">字符串代码解释</h4>
+<h3 id="python的ast功能">
+  Python的ast功能
+  <a class="heading-link" href="#python%e7%9a%84ast%e5%8a%9f%e8%83%bd">
+    <i class="fa fa-link" aria-hidden="true"></i>
+  </a>
+</h3>
+<h4 id="字符串代码解释">
+  字符串代码解释
+  <a class="heading-link" href="#%e5%ad%97%e7%ac%a6%e4%b8%b2%e4%bb%a3%e7%a0%81%e8%a7%a3%e9%87%8a">
+    <i class="fa fa-link" aria-hidden="true"></i>
+  </a>
+</h4>
 <p>Python支持执行以字符串形式提供的源代码，例如：</p>
-<pre tabindex="0"><code>	&gt;&gt;&gt; x = 42
-	&gt;&gt;&gt; eval('2 + 3*4 + x')
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">	&gt;&gt;&gt; x = 42
+	&gt;&gt;&gt; eval(&#39;2 + 3*4 + x&#39;)
 	56
-	&gt;&gt;&gt; exec('for i in range(5): print(i)')
+	&gt;&gt;&gt; exec(&#39;for i in range(5): print(i)&#39;)
 	0
 	1
 	2
 	3
 	4
-</code></pre><h4 id="python-语法树转换">Python 语法树转换</h4>
+</code></pre></div><h4 id="python-语法树转换">
+  Python 语法树转换
+  <a class="heading-link" href="#python-%e8%af%ad%e6%b3%95%e6%a0%91%e8%bd%ac%e6%8d%a2">
+    <i class="fa fa-link" aria-hidden="true"></i>
+  </a>
+</h4>
 <p>可以使用ast模块将python源代码编译为一个抽象语法树，这样就可以分析源代码，例如：</p>
-<pre tabindex="0"><code>&gt;&gt;&gt; import ast
-&gt;&gt;&gt; ex = ast.parse('2 + 3*4 +x', mode='eval')
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">&gt;&gt;&gt; import ast
+&gt;&gt;&gt; ex = ast.parse(&#39;2 + 3*4 +x&#39;, mode=&#39;eval&#39;)
 &gt;&gt;&gt; ex
 &lt;ast.Expression object at 0x7f19a73c1d90&gt;
 &gt;&gt;&gt; ast.dump(ex)
-&quot;Expression(body=BinOp(left=BinOp(left=Constant(value=2), op=Add(), right=BinOp(left=Constant(value=3), op=Mult(), right=Constant(value=4))), op=Add(), right=Name(id='x', ctx=Load())))&quot;
-</code></pre><p>ast的parse方法会将源代码解析为语法树的节点，mode参数可以选择为:</p>
+&#34;Expression(body=BinOp(left=BinOp(left=Constant(value=2), op=Add(), right=BinOp(left=Constant(value=3), op=Mult(), right=Constant(value=4))), op=Add(), right=Name(id=&#39;x&#39;, ctx=Load())))&#34;
+</code></pre></div><p>ast的parse方法会将源代码解析为语法树的节点，mode参数可以选择为:</p>
 <ul>
 <li>exec, 代表编译一个模块</li>
 <li>single, 一个单独的语句</li>
@@ -190,7 +211,7 @@
 <hr>
 <p>ast模块支持对各个树的节点进行操作，通过定义一个访问者类，在类中实现了各种的visit_NodeName()方法，把感兴趣的节点保留下来</p>
 <p>下面给出了一个类似的例子，记录被加载、保存和删除过的节点名称：</p>
-<pre tabindex="0"><code>import ast
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">import ast
 
 class CodeAnalyzer(ast.NodeVisitor):
 	def __init__(self):
@@ -205,28 +226,28 @@ class CodeAnalyzer(ast.NodeVisitor):
 		elif isinstance(node.ctx, ast.Del):
 			self.deleted.add(node.id)
 
-if __name__ == '__main__':
-	code = '''
+if __name__ == &#39;__main__&#39;:
+	code = &#39;&#39;&#39;
 for i in range(10):
     print(i)
 del i
-	'''
+	&#39;&#39;&#39;
 
-	top = ast.parse(code, mode='exec')
+	top = ast.parse(code, mode=&#39;exec&#39;)
 
 	c = CodeAnalyzer()
 	c.visit(top)
-	print('Loaded:', c.loaded)
-	print('Stored:', c.stored)
-	print('Deleted:', c.deleted)
-</code></pre><p>这里通过对visit_Name的方法保留节点的名字，可以解析出code变量代码的节点名称。运行代码的输出：</p>
-<pre tabindex="0"><code>Loaded: {'i', 'print', 'range'}
-Stored: {'i'}
-Deleted: {'i'}
-</code></pre><hr>
+	print(&#39;Loaded:&#39;, c.loaded)
+	print(&#39;Stored:&#39;, c.stored)
+	print(&#39;Deleted:&#39;, c.deleted)
+</code></pre></div><p>这里通过对visit_Name的方法保留节点的名字，可以解析出code变量代码的节点名称。运行代码的输出：</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">Loaded: {&#39;i&#39;, &#39;print&#39;, &#39;range&#39;}
+Stored: {&#39;i&#39;}
+Deleted: {&#39;i&#39;}
+</code></pre></div><hr>
 <p>除了遍历节点名字，还可以通过函数，然后修改代码以此达到插桩代码的效果。</p>
 <p>下面会增加一个装饰器，该装饰器会对被装饰的函数进行代码的插桩，通过插入gloabls变量将全局变量变成局部变量，来比对其中的性能：</p>
-<pre tabindex="0"><code># namelower.py
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"># namelower.py
 import ast
 import inspect
 
@@ -238,10 +259,10 @@ class NameLower(ast.NodeVisitor):
 
 	def visit_FunctionDef(self, node):
 		# Compile some assignment to lower the constants
-		code = '_globals = globals()\n'
-		code += '\n'.join(&quot;{0} = _globals['{0}']&quot;.format(name)
+		code = &#39;_globals = globals()\n&#39;
+		code += &#39;\n&#39;.join(&#34;{0} = _globals[&#39;{0}&#39;]&#34;.format(name)
 				for name in self.lowered_names)
-		code_ast = ast.parse(code, mode='exec')
+		code_ast = ast.parse(code, mode=&#39;exec&#39;)
 
 		# Inject new statements into the function body
 		node.body[:0] = code_ast.body
@@ -255,14 +276,14 @@ def lower_names(*namelist):
 		srclines = inspect.getsource(func).splitlines()
 		# Skip source lines prior to the @lower_names decorator
 		for n, line in enumerate(srclines):
-			if '@lower_names' in line:
+			if &#39;@lower_names&#39; in line:
 				break
 
-		src = '\n'.join(srclines[n+1:])
+		src = &#39;\n&#39;.join(srclines[n+1:])
 		# Hack to deal with indented code
-		if src.startswith((' ', '\t')):
-			src = 'if 1:\n' + src
-		top = ast.parse(src, mode='exec')
+		if src.startswith((&#39; &#39;, &#39;\t&#39;)):
+			src = &#39;if 1:\n&#39; + src
+		top = ast.parse(src, mode=&#39;exec&#39;)
 
 		# Transform the AST
 		cl = NameLower(namelist)
@@ -270,7 +291,7 @@ def lower_names(*namelist):
 
 		# Execute the modified AST
 		temp = {}
-		exec(compile(top, '', 'exec'), temp, temp)
+		exec(compile(top, &#39;&#39;, &#39;exec&#39;), temp, temp)
 
 		# Pull out the modified code object
 		func.__code__ = temp[func.__name__].__code__
@@ -288,14 +309,14 @@ def timethis(func):
 		start = time.perf_counter()
 		r = func(*args, **kwargs)
 		end = time.perf_counter()
-		print('{}.{} : {}'.format(func.__module__, func.__name__, end - start))
+		print(&#39;{}.{} : {}&#39;.format(func.__module__, func.__name__, end - start))
 		return r
 	return wrapper
 
 INCR = 1
 
 @timethis
-@lower_names('INCR')
+@lower_names(&#39;INCR&#39;)
 def countdown(n):
 	while n &gt; 0:
 		n -= INCR
@@ -305,64 +326,105 @@ def countdown_raw(n):
 	while n &gt; 0:
 		n -= INCR
 
-if __name__ == '__main__':
-	print('no add local variable')
+if __name__ == &#39;__main__&#39;:
+	print(&#39;no add local variable&#39;)
 	countdown_raw(20000000)
-	print('add local variable')
+	print(&#39;add local variable&#39;)
 	countdown(20000000)
-</code></pre><p>其中有两个文件，一个是namelower.py模块，提供了lower_names装饰器，对被装饰的函数进行插桩，被插桩后的countdown函数如下：</p>
-<pre tabindex="0"><code>def countdown(n):
+</code></pre></div><p>其中有两个文件，一个是namelower.py模块，提供了lower_names装饰器，对被装饰的函数进行插桩，被插桩后的countdown函数如下：</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">def countdown(n):
 	_globals = globals()
-	INCR = _globals['INCR']
+	INCR = _globals[&#39;INCR&#39;]
 	while n &gt; 0:
 		n -= INCR
-</code></pre><p>然后执行test.py文件进行性能测试，测试中能发现插桩后的代码性能提升了20%:</p>
-<pre tabindex="0"><code>no add local variable
+</code></pre></div><p>然后执行test.py文件进行性能测试，测试中能发现插桩后的代码性能提升了20%:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">no add local variable
 __main__.countdown_raw : 1.2053479370079003
 add local variable
 __main__.countdown : 0.9712031570088584
-</code></pre><ul class="pa0">
-  
-</ul>
-<div class="mt6 instapaper_ignoref">
-      
-      
+</code></pre></div>
       </div>
-    </div>
-
-    <aside class="w-30-l mt6-l">
 
 
+      <footer>
+        
 
 
-</aside>
+        <div id="disqus_thread"></div>
+<script type="application/javascript">
+    var disqus_config = function () {
+    
+    
+    
+    };
+    (function() {
+        if (["localhost", "127.0.0.1"].indexOf(window.location.hostname) != -1) {
+            document.getElementById('disqus_thread').innerHTML = 'Disqus comments not available by default when the website is previewed locally.';
+            return;
+        }
+        var d = document, s = d.createElement('script'); s.async = true;
+        s.src = '//' + "jie" + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="https://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+        
+        
+      </footer>
+    </article>
 
-  </article>
+    
+  </section>
+
+      </div>
+
+      
+  <footer class="footer">
+    <section class="container">
+      
+      
+        ©
+        
+          2019 -
+        
+        2021
+         Jie Cai 
+      
+      
+         · 
+        Powered by <a href="https://gohugo.io/">Hugo</a> & <a href="https://github.com/luizdepra/hugo-coder/">Coder</a>.
+      
+      
+    </section>
+  </footer>
+
 
     </main>
-    <footer class="bg-black bottom-0 w-100 pa3" role="contentinfo">
-  <div class="flex justify-between">
-  <a class="f4 fw4 hover-white no-underline white-70 dn dib-ns pv2 ph3" href="http://example.org/" >
-    &copy;  Jie Blog 2021 
-  </a>
-    <div>
 
+    
+      
+      <script src="/js/coder.min.03b17769f4f91ae35667e1f2a1ca8c16f50562576cf90ff32b3179926914daa5.js" integrity="sha256-A7F3afT5GuNWZ&#43;HyocqMFvUFYlds&#43;Q/zKzF5kmkU2qU="></script>
+    
 
+    
+      <script src="/js/custom.js"></script>
+    
 
+    
 
+    
 
+    
 
+    
 
+    
 
+    
 
-
-
-
-
-
-</div>
-  </div>
-</footer>
-
+    
   </body>
+
 </html>

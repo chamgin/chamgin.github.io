@@ -15,9 +15,9 @@
       <guid>http://example.org/python/ast/</guid>
       <description>python支持对编写的程序进行源代码的改动，例如通过AST模块将代码进行解析成语法树，然后在遍历语法节点的过程中对代码进行改动
 本文主要讨论Python的ast语法解析及代码插桩过程。
- Python的ast功能 字符串代码解释 Python支持执行以字符串形式提供的源代码，例如：
-	&amp;gt;&amp;gt;&amp;gt; x = 42 &amp;gt;&amp;gt;&amp;gt; eval(&#39;2 + 3*4 + x&#39;) 56 &amp;gt;&amp;gt;&amp;gt; exec(&#39;for i in range(5): print(i)&#39;) 0 1 2 3 4 Python 语法树转换 可以使用ast模块将python源代码编译为一个抽象语法树，这样就可以分析源代码，例如：
-&amp;gt;&amp;gt;&amp;gt; import ast &amp;gt;&amp;gt;&amp;gt; ex = ast.parse(&#39;2 + 3*4 +x&#39;, mode=&#39;eval&#39;) &amp;gt;&amp;gt;&amp;gt; ex &amp;lt;ast.Expression object at 0x7f19a73c1d90&amp;gt; &amp;gt;&amp;gt;&amp;gt; ast.dump(ex) &amp;quot;Expression(body=BinOp(left=BinOp(left=Constant(value=2), op=Add(), right=BinOp(left=Constant(value=3), op=Mult(), right=Constant(value=4))), op=Add(), right=Name(id=&#39;x&#39;, ctx=Load())))&amp;quot; ast的parse方法会将源代码解析为语法树的节点，mode参数可以选择为:
+ Python的ast功能    字符串代码解释    Python支持执行以字符串形式提供的源代码，例如：
+&amp;gt;&amp;gt;&amp;gt; x = 42 &amp;gt;&amp;gt;&amp;gt; eval(&amp;#39;2 + 3*4 + x&amp;#39;) 56 &amp;gt;&amp;gt;&amp;gt; exec(&amp;#39;for i in range(5): print(i)&amp;#39;) 0 1 2 3 4 Python 语法树转换    可以使用ast模块将python源代码编译为一个抽象语法树，这样就可以分析源代码，例如：
+&amp;gt;&amp;gt;&amp;gt; import ast &amp;gt;&amp;gt;&amp;gt; ex = ast.parse(&amp;#39;2 + 3*4 +x&amp;#39;, mode=&amp;#39;eval&amp;#39;) &amp;gt;&amp;gt;&amp;gt; ex &amp;lt;ast.Expression object at 0x7f19a73c1d90&amp;gt; &amp;gt;&amp;gt;&amp;gt; ast.dump(ex) &amp;#34;Expression(body=BinOp(left=BinOp(left=Constant(value=2), op=Add(), right=BinOp(left=Constant(value=3), op=Mult(), right=Constant(value=4))), op=Add(), right=Name(id=&amp;#39;x&amp;#39;, ctx=Load())))&amp;#34; ast的parse方法会将源代码解析为语法树的节点，mode参数可以选择为:
  exec, 代表编译一个模块 single, 一个单独的语句 eval，一个表达式 通过dump方法可以看到展开的语法树，树的结构如下图：   ast模块支持对各个树的节点进行操作，通过定义一个访问者类，在类中实现了各种的visit_NodeName()方法，把感兴趣的节点保留下来</description>
     </item>
     
