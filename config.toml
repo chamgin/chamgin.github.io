@@ -69,10 +69,10 @@ disqusShortname = "jie"
   url  = "posts/"
 [[menu.main]]
   name = "Python"
-  weight = 1
+  weight = 2
   url = "python/"
 [[menu.main]]
   name = "About"
-  weight = 2
+  weight = 3
   url = "about/"
 
