@@ -72,7 +72,11 @@ disqusShortname = "jie"
   weight = 2
   url = "python/"
 [[menu.main]]
-  name = "About"
+  name = "Leetcode"
   weight = 3
+  url = "leetcode/"
+[[menu.main]]
+  name = "About"
+  weight = 4
   url = "about/"
 
