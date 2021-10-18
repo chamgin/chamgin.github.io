@@ -21,8 +21,8 @@ disqusShortname = "jie"
   avatarurl = "images/avatar.jpg"
   #gravatar = "john.doe@example.com"
 
-  favicon_32 = "/img/favicon-32x32.png"
-  favicon_16 = "/img/favicon-16x16.png"
+  favicon_32 = "/images/favicon-32x32.png"
+  favicon_16 = "/images/favicon-16x16.png"
 
   # footercontent = "Enter a text here."
   hideFooter = false
@@ -67,6 +67,10 @@ disqusShortname = "jie"
   name = "Blog"
   weight = 1
   url  = "posts/"
+[[menu.main]]
+  name = "Python"
+  weight = 1
+  url = "python/"
 [[menu.main]]
   name = "About"
   weight = 2
