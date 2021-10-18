@@ -21,8 +21,8 @@ disqusShortname = "jie"
   avatarurl = "images/avatar.jpg"
   #gravatar = "john.doe@example.com"
 
-  favicon_32 = "/images/favicon-32x32.png"
-  favicon_16 = "/images/favicon-16x16.png"
+  favicon_32 = "images/favicon-32x32.jpg"
+  favicon_16 = "images/favicon-16x16.jpg"
 
   # footercontent = "Enter a text here."
   hideFooter = false
