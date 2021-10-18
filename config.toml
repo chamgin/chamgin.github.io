@@ -37,7 +37,7 @@ disqusShortname = "jie"
 
   # customCSS = ["css/custom.css"]
   # customSCSS = ["scss/custom.scss"]
-  customJS = ["js/custom.js"]
+  # customJS = ["js/custom.js"]
 
 [taxonomies]
   category = "categories"
