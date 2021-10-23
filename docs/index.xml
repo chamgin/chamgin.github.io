@@ -6,7 +6,22 @@
     <description>Recent content on Jie Blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Mon, 18 Oct 2021 19:11:38 +0800</lastBuildDate><atom:link href="http://example.org/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Wed, 20 Oct 2021 18:00:50 +0800</lastBuildDate><atom:link href="http://example.org/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>git rebase 命令</title>
+      <link>http://example.org/tools/git_rebase/</link>
+      <pubDate>Wed, 20 Oct 2021 18:00:50 +0800</pubDate>
+      
+      <guid>http://example.org/tools/git_rebase/</guid>
+      <description>git rebase 可以将当前的commit 转移到其他commit 的基础上，主要是改写了commit hisotry，因此可以解决很多问题，例如合并多个commit，将当前分支基于其他分支进行合并等。
+ 使用rebase合并多个commit     当做一些项目调试时可能因为加临时代码会有多个commit, git log显得冗长，可以使用git rebase 在本地将多个commit 进行合并后再push上去。 首先git log确定开始和结束的commit id范围，例如合并前3次commit可以这样操作：
+git rebase -i HEAD~3
+这样就会进入交互界面，在前两次使用squash可以合并到后一次commit，常用的操作有：    命令 用途     pick 使用该commit   reword 修改commit 消息   squash 保留该commit，但合并到上一个commit   fixup 类似squash，但去掉commit message   drop 删除该commit    之后将后面的操作由pick变更为squash，然后:x(使用默认编辑器是vi的话)保存退出
+然后进入修改commit message的页面，可以考虑删掉前面几次的commit message，然后在最近的进行修改即可。完成后保存退出即可。
+之后使用git log即可看到自己的commit history被改写了，然后push即可。
+ 使用rebase在多个开发时解决冲突     日常开发过程中一般都是一个项目同个需求有多人合作开发，当开发完成代码后可能因为其他同事上传了已完成的代码导致出现某些冲突，或者想要将自己的代码基于同事的代码继续开发，都可以使用rebase进行合并。</description>
+    </item>
+    
     <item>
       <title>LeetCode 周赛 263</title>
       <link>http://example.org/leetcode/week-263/</link>
