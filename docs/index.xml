@@ -6,7 +6,31 @@
     <description>Recent content on Jie Blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Wed, 20 Oct 2021 18:00:50 +0800</lastBuildDate><atom:link href="http://example.org/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Sun, 31 Oct 2021 14:49:38 +0800</lastBuildDate><atom:link href="http://example.org/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>LeetCode 周赛 265</title>
+      <link>http://example.org/leetcode/week-265/</link>
+      <pubDate>Sun, 31 Oct 2021 14:49:38 +0800</pubDate>
+      
+      <guid>http://example.org/leetcode/week-265/</guid>
+      <description>LeetCode 265场周赛题解    5914. 值相等的最小索引    给你一个下标从 0 开始的整数数组 nums ，返回 nums 中满足 i mod 10 == nums[i] 的最小下标 i ；如果不存在这样的下标，返回 -1 。
+x mod y 表示 x 除以 y 的 余数 。
+思路 直接比较
+代码
+class Solution: def smallestEqual(self, nums: List[int]) -&amp;gt; int: for i, num in enumerate(nums): if i % 10 == num: return i return -1 5915. 找出临界点之间的最小和最大距离    思路 先找出所有的临界值，无论是最大还是最小，都把坐标放到数组中，最后最大距离就是排序的两端距离，最小距离需要遍历数组</description>
+    </item>
+    
+    <item>
+      <title>LeetCode 周赛 264</title>
+      <link>http://example.org/leetcode/week-264/</link>
+      <pubDate>Sun, 24 Oct 2021 20:31:38 +0800</pubDate>
+      
+      <guid>http://example.org/leetcode/week-264/</guid>
+      <description>LeetCode 264场周赛题解    2047. 句子中的有效单词数    思路 直接模拟检查，注意这里的&#39;-&amp;lsquo;符号两边是指该符号的左右两边，检查有点繁琐
+代码
+class Solution: def is_valid(self, token: str) -&amp;gt; int: for c in token: if c &amp;gt;= &amp;#39;0&amp;#39; and c &amp;lt;= &amp;#39;9&amp;#39;: return 0 if c &amp;gt;= &amp;#39;A&amp;#39; and c &amp;lt;= &amp;#39;Z&amp;#39;: return 0 if token[0] == &amp;#39;-&amp;#39; or token[len(token)-1] == &amp;#39;-&amp;#39;: return 0 num_her = 0 num_other = 0 for c in token: if c == &amp;#39;-&amp;#39;: num_her += 1 elif c &amp;lt; &amp;#39;a&amp;#39; or c &amp;gt; &amp;#39;z&amp;#39;: num_other += 1 if num_her &amp;gt; 1: return 0 elif num_her == 1: for i in range(len(token)): if token[i] == &amp;#39;-&amp;#39;: if i &amp;gt; 0: if token[i-1] &amp;lt; &amp;#39;a&amp;#39; or token[i-1] &amp;gt; &amp;#39;z&amp;#39;: return 0 if i &amp;lt; len(token) -1: if token[i+1] &amp;lt; &amp;#39;a&amp;#39; or token[i+1] &amp;gt; &amp;#39;z&amp;#39;: return 0 break if num_other &amp;gt; 1: return 0 if num_other: if token[-1] &amp;lt; &amp;#39;a&amp;#39; or token[-1] &amp;gt; &amp;#39;z&amp;#39;: return 1 else: return 0 return 1 def countValidWords(self, sentence: str) -&amp;gt; int: ret = 0 for token in sentence.</description>
+    </item>
+    
     <item>
       <title>git rebase 命令</title>
       <link>http://example.org/tools/git_rebase/</link>
